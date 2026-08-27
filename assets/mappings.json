@@ -1,0 +1,44 @@
+{
+    "sociedades": {
+        "SL": "sociedad limitada",
+        "S.L.": "sociedad limitada",
+        "S.L": "sociedad limitada",
+        "SA": "sociedad anónima",
+        "S.A.": "sociedad anónima",
+        "S.A": "sociedad anónima",
+        "SLU": "sociedad limitada unipersonal",
+        "S.L.U.": "sociedad limitada unipersonal"
+    },
+    "vias": {
+        "C/": "calle",
+        "C.": "calle",
+        "CALLE": "calle",
+        "AVDA": "avenida",
+        "AV.": "avenida",
+        "AV": "avenida",
+        "AVENIDA": "avenida",
+        "PZ": "plaza",
+        "PLAZA": "plaza",
+        "PZA": "plaza",
+        "PSO": "paseo",
+        "PASEO": "paseo",
+        "CTRA": "carretera",
+        "CLLON": "callejon",
+        "RBLA": "rambla",
+        "ZONA": "zona",
+        "URB": "urbanizacion"
+    },
+    "provincias": {
+        "02": "albacete", "03": "alicante", "04": "almería", "01": "álava", "33": "asturias",
+        "05": "ávila", "06": "badajoz", "07": "baleares", "08": "barcelona", "48": "vizcaya",
+        "09": "burgos", "10": "cáceres", "11": "cádiz", "39": "cantabria", "12": "castellón",
+        "51": "ceuta", "13": "ciudad real", "14": "córdoba", "15": "coruña", "16": "cuenca",
+        "20": "guipúzcoa", "17": "girona", "18": "granada", "19": "guadalajara", "21": "huelva",
+        "22": "huesca", "23": "jaén", "24": "león", "25": "lleida", "27": "lugo", "28": "madrid",
+        "29": "málaga", "52": "melilla", "30": "murcia", "31": "navarra", "32": "ourense",
+        "34": "palencia", "35": "las palmas", "36": "pontevedra", "26": "la rioja", "37": "salamanca",
+        "38": "santa cruz de tenerife", "40": "segovia", "41": "sevilla", "42": "soria",
+        "43": "tarragona", "44": "teruel", "45": "toledo", "46": "valencia", "47": "valladolid",
+        "49": "zamora", "50": "zaragoza"
+    }
+}

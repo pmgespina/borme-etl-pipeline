@@ -1,0 +1,13 @@
+# Entorno virtual
+venv/
+
+# Datos generados por el pipeline (ver README: se regeneran ejecutando src/)
+data/logs/
+data/outputs/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
