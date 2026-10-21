@@ -136,7 +136,12 @@ def parsear_domicilio(domicilio_str, mappings):
         match_num_label = re.search(r'(?:Nº|N\.|NUM\.|N[ÚU]MERO)\s*(\d+)', resto_texto, re.IGNORECASE)
         
         # B) Separación por coma ("Calle X, 10")
+        # Solo vale si lo que sigue a la coma es un número de portal, no un piso:
+        # en "Avda. X 25, 3º B" el "3º" es la planta y el número real es el 25.
         parts_comma = resto_texto.rsplit(",", 1)
+        match_comma = None
+        if len(parts_comma) > 1:
+            match_comma = re.match(r'(\d+)\b(?!\s*[ºª])', parts_comma[1].strip())
         
         # C) Marcadores de vivienda ("Esc", "Piso", "2º")
         match_marker = re.search(
@@ -158,12 +163,9 @@ def parsear_domicilio(domicilio_str, mappings):
             numero_encontrado = match_num_label.group(1)
             nombre_calle_sucio = resto_texto[:match_num_label.start()]
             
-        elif len(parts_comma) > 1:
-            posible_numero = parts_comma[1].strip()
-            match_digitos = re.search(r'^(\d+)', posible_numero)
-            if match_digitos:
-                numero_encontrado = match_digitos.group(1)
-                nombre_calle_sucio = parts_comma[0]
+        elif match_comma:
+            numero_encontrado = match_comma.group(1)
+            nombre_calle_sucio = parts_comma[0]
         
         elif match_marker: 
             numero_encontrado = match_marker.group(1)
