@@ -9,7 +9,8 @@ import csv
 import re
 
 # Configuración de rutas
-ASSETS_PATH = "/Users/pablomoreno/Desktop/ADQUISICION/clase10/practicafinal/assets/mappings.json"
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ASSETS_PATH = os.path.join(PROJECT_ROOT, "assets", "mappings.json")
 
 def cargar_mappings():
     """
@@ -18,14 +19,10 @@ def cargar_mappings():
     - Transformar "S.L." -> "sociedad limitada"
     - Identificar que el código "28" -> "madrid"
     """
-    try:
-        with open(ASSETS_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        # Si falla, devolvemos diccionarios vacíos para que el programa no se rompa,
-        # aunque los datos saldrán sin traducir.
-        print(f"AVISO: No se encontró el archivo de mappings en {ASSETS_PATH}")
-        return {"sociedades": {}, "vias": {}, "provincias": {}}
+    if not os.path.exists(ASSETS_PATH):
+        raise FileNotFoundError(f"No se encontró el archivo de mappings en {ASSETS_PATH}")
+    with open(ASSETS_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 def limpiar_texto_basico(texto):
     """
