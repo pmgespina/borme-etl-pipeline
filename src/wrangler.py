@@ -40,9 +40,10 @@ def limpiar_capital(capital_str):
     Transforma el texto del dinero en un número matemático (float).
     Entrada: "3.000,00 Euros"
     Salida: 3000.0
+    Si el dato falta o no se puede interpretar devuelve None (celda vacía en el CSV).
     """
     if not capital_str:
-        return 0.0
+        return None
     try:
         # 1. Quitamos la palabra "euros" y espacios.
         limpio = capital_str.lower().replace("euros", "").strip()
