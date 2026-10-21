@@ -11,9 +11,9 @@ El sistema es capaz de rastrear la web del BOE, descargar los boletines oficiale
 El proyecto sigue una arquitectura modular donde un orquestador (`__main__.py`) coordina a los distintos módulos especializados:
 
 ```text
-practicafinal/
+borme-etl-pipeline/
 ├── assets/
-│   └── mappings.json        # Diccionarios para normalizar provincias, vías y tipos de sociedad.
+│   └── mappings.json        # Diccionarios para normalizar provincias, tipos de vía y tipos de sociedad.
 ├── data/
 │   ├── inputs/              # Archivos de entrada opcionales.
 │   ├── logs/                # Registros de ejecución (historial de errores y procesos).
@@ -29,6 +29,11 @@ practicafinal/
 │   ├── http_client.py       # Sesión HTTP compartida (timeouts, reintentos, User-Agent).
 │   ├── crawler.py           # Extractor de información (PDF -> JSON).
 │   └── wrangler.py          # Limpiador de datos (JSON -> CSV).
+├── tests/                   # Tests unitarios (pytest), sin necesidad de red.
+│   ├── conftest.py          # Añade src/ a la ruta de importación.
+│   ├── test_crawler.py      # Bloques de empresa: nombres, campos, actos ignorados.
+│   ├── test_spider_fetcher.py # Extracción de enlaces, deduplicación, descargas omitidas y fallidas.
+│   └── test_wrangler.py     # Direcciones, capital, fechas, provincias, tipos de sociedad.
 ├── requirements.txt         # Lista de dependencias externas.
 └── README.md                # Documentación del proyecto.
 ```

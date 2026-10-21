@@ -11,7 +11,7 @@ The system is able to crawl the BOE website, download the official bulletins as 
 The project follows a modular architecture in which an orchestrator (`__main__.py`) coordinates the different specialized modules:
 
 ```text
-practicafinal/
+borme-etl-pipeline/
 ├── assets/
 │   └── mappings.json        # Dictionaries to normalize provinces, street types and company types.
 ├── data/
@@ -29,6 +29,11 @@ practicafinal/
 │   ├── http_client.py       # Shared HTTP session (timeouts, retries, User-Agent).
 │   ├── crawler.py           # Information extractor (PDF -> JSON).
 │   └── wrangler.py          # Data cleaner (JSON -> CSV).
+├── tests/                   # Unit tests (pytest), no network needed.
+│   ├── conftest.py          # Adds src/ to the import path.
+│   ├── test_crawler.py      # Company blocks: names, fields, ignored acts.
+│   ├── test_spider_fetcher.py # Link extraction, deduplication, skipped and failed downloads.
+│   └── test_wrangler.py     # Addresses, capital, dates, provinces, company types.
 ├── requirements.txt         # External dependencies list.
 └── README.md                # Project documentation.
 ```
