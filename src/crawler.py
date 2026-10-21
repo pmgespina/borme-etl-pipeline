@@ -88,13 +88,17 @@ def procesar_texto(text):
         # La parte derecha es el nombre + el resto del texto
         resto_texto = parts[1].strip()
         
-        # El nombre suele acabar en el primer punto "."
-        nombre_end = resto_texto.find(".")
-        
-        if nombre_end != -1:
-            nombre = resto_texto[:nombre_end].strip()
+        # Hay un nombre que NO acaba en el primer punto: "J.M. CONSULTORES S.L.".
+        # En el BORME los nombres van en mayúsculas y los actos que les siguen empiezan
+        # con mayúscula y continúan en minúscula ("Constitución", "Nombramientos"...).
+        # Por eso el nombre termina en el primer punto seguido de una palabra capitalizada.
+        nombre_match = re.search(r'\.\s+(?=[A-ZÁÉÍÓÚÑ][a-záéíóúñ])', resto_texto)
+        if nombre_match:
+            nombre = resto_texto[:nombre_match.start()].strip()
         else:
-            nombre = resto_texto
+            # Formato inesperado: cogemos todo hasta el primer punto o, si no hay, todo el resto del texto
+            nombre_end = resto_texto.find(".")
+            nombre = resto_texto[:nombre_end].strip() if nombre_end != -1 else resto_texto
             
         # Guardamos estos datos básicos
         info["Nombre"] = nombre
