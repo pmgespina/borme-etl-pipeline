@@ -8,6 +8,11 @@ import json
 import csv
 import re
 
+import logging
+
+# Los mensajes van al logger configurado en __main__.py: consola y fichero de log
+logger = logging.getLogger(__name__)
+
 # Configuración de rutas
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS_PATH = os.path.join(PROJECT_ROOT, "assets", "mappings.json")
@@ -223,8 +228,8 @@ def run_wrangler(input_json, output_csv):
     """
     Orquesta todo el proceso de lectura, limpieza y escritura.
     """
-    print("Iniciando Wrangler...")
-    print(f"Leyendo datos de: {input_json}")
+    logger.info("Iniciando Wrangler...")
+    logger.info(f"Leyendo datos de: {input_json}")
     
     mappings = cargar_mappings()
     
@@ -232,8 +237,8 @@ def run_wrangler(input_json, output_csv):
         with open(input_json, "r", encoding="utf-8") as f:
             data_cruda = json.load(f)
     except FileNotFoundError:
-        print("Error: No se encontró el archivo de entrada JSON.")
-        return
+        logger.error("Error: No se encontró el archivo de entrada JSON.")
+        return 1
 
     empresas_procesadas = []
 
@@ -287,7 +292,9 @@ def run_wrangler(input_json, output_csv):
             writer.writeheader() # Escribe la fila de títulos
             writer.writerows(empresas_procesadas) # Escribe los datos
             
-        print(f"Limpieza completada. {len(empresas_procesadas)} empresas guardadas en: {output_csv}")
+        logger.info(f"Limpieza completada. {len(empresas_procesadas)} empresas guardadas en: {output_csv}")
+        return 0
         
     except Exception as e:
-        print(f"Error escribiendo el CSV: {e}")
+        logger.error(f"Error escribiendo el CSV: {e}")
+        return 1

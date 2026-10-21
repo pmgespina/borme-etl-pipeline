@@ -8,6 +8,11 @@ import json
 import re
 from pypdf import PdfReader
 
+import logging
+
+# Los mensajes van al logger configurado en __main__.py: consola y fichero de log
+logger = logging.getLogger(__name__)
+
 def cargar_ficheros(path):
     """
     Función encargada de buscar qué archivos vamos a procesar.
@@ -174,7 +179,7 @@ def parsear_pdf(pdf_path):
     
     nombre_archivo = os.path.basename(pdf_path)
 
-    print(f"Parseando archivo: {nombre_archivo}")
+    logger.info(f"Parseando archivo: {nombre_archivo}")
     empresas = []
 
     try:
@@ -190,7 +195,7 @@ def parsear_pdf(pdf_path):
                 full_text += texto_pagina + "\n" 
         
         if not full_text:
-            print("Aviso: No se extrajo texto del PDF")
+            logger.warning("Aviso: No se extrajo texto del PDF")
             return []
 
         # Dividimos todo el texto gigante en líneas individuales
@@ -236,7 +241,8 @@ def parsear_pdf(pdf_path):
                 empresas.append(empresa_data)
 
     except Exception as e:
-        print(f"Error procesando el PDF {pdf_path}: {e}")
+        logger.error(f"Error procesando el PDF {pdf_path}: {e}")
+        return None
 
     return empresas
 
@@ -244,18 +250,21 @@ def run_crawler(input_path, output_file):
     """
     Función que coordina todo el proceso: busca archivos, los lee uno a uno y guarda el resultado final.
     """
-    print(f"Iniciando Crawler con PyPDF sobre: {input_path}")
+    logger.info(f"Iniciando Crawler con PyPDF sobre: {input_path}")
     
     # 1. Obtenemos la lista de archivos a leer
     files = cargar_ficheros(input_path)
     all_data = []
+    errores = 0
     
-    print(f"Se han encontrado {len(files)} archivos PDF.")
+    logger.info(f"Se han encontrado {len(files)} archivos PDF.")
     
     # 2. Bucle principal: Procesamos cada archivo PDF
     for pdf_file in files:
         data = parsear_pdf(pdf_file) # Esto nos devuelve una lista de empresas de ese PDF
-        if data:
+        if data is None:
+            errores += 1
+        elif data:
             all_data.extend(data) # Las añadimos a la lista general
             
     # 3. Guardado final en JSON
@@ -269,8 +278,13 @@ def run_crawler(input_path, output_file):
             # indent=4 hace que el JSON se vea bonito y legible
             json.dump(all_data, f, ensure_ascii=False, indent=4)
         
-        print(f"\nDatos guardados correctamente en {output_file}")
-        print(f"Total empresas procesadas: {len(all_data)}")
+        logger.info(f"Datos guardados correctamente en {output_file}")
+        logger.info(f"Total empresas procesadas: {len(all_data)}")
         
     except Exception as e:
-        print(f"Error guardando el JSON: {e}")
+        logger.error(f"Error guardando el JSON: {e}")
+        errores += 1
+
+    if errores:
+        logger.warning(f"{errores} errores durante el crawler (ver mensajes anteriores).")
+    return errores

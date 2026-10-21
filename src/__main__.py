@@ -73,40 +73,49 @@ def main():
 
     logging.info(f"INICIO DE EJECUCIÓN: FASE {args.phase.upper()}")
 
-    # Aquí definimos la lógica de las fases del proyecto
+    # Aquí definimos la lógica de las fases del proyecto.
+    # Cada fase devuelve su número de errores. Terminamos con código de salida 1 si hubo
+    # alguno: así un bucle de bash, cron o un orquestador (Airflow...) detecta el fallo,
+    # en lugar de recibir un 0 y dar por buena una ejecución que no lo fue.
 
     try:
         if args.phase == 'spider':
             if not args.day:
                 logging.error("Falta el argumento fecha (-d).")
-                return
+                return 1
             logging.info(f"Lanzando Spider para el día {args.day}")
-            spider.run_spider(args.day, DEFAULT_URLS)
+            errores = spider.run_spider(args.day, DEFAULT_URLS)
 
         elif args.phase == 'fetcher':
             logging.info("Lanzando Fetcher...")
-            fetcher.run_fetcher(DEFAULT_URLS, DEFAULT_PDFS)
+            errores = fetcher.run_fetcher(DEFAULT_URLS, DEFAULT_PDFS)
 
         elif args.phase == 'crawler':
             input_path = args.directorypath or args.filepath or DEFAULT_PDFS
             if not os.path.exists(input_path):
                 logging.error(f"No existe la ruta: {input_path}")
-                return
+                return 1
             logging.info(f"Lanzando Crawler sobre: {input_path}")
-            crawler.run_crawler(input_path, DEFAULT_JSON)
+            errores = crawler.run_crawler(input_path, DEFAULT_JSON)
 
         elif args.phase == 'wrangler':
             input_file = args.filepath or DEFAULT_JSON
             if not os.path.exists(input_file):
                 logging.error(f"No existe el archivo JSON: {input_file}")
-                return
+                return 1
             logging.info(f"Lanzando Wrangler sobre: {input_file}")
-            wrangler.run_wrangler(input_file, DEFAULT_CSV)
-            
-        logging.info(f"FIN DE EJECUCIÓN CORRECTA DE {args.phase.upper()}")
+            errores = wrangler.run_wrangler(input_file, DEFAULT_CSV)
 
     except Exception as e:
         logging.critical(f"ERROR CRÍTICO DURANTE LA EJECUCIÓN: {e}", exc_info=True)
+        return 1
+
+    if errores:
+        logging.error(f"FIN DE {args.phase.upper()} CON {errores} ERRORES (revisa el log)")
+        return 1
+
+    logging.info(f"FIN DE EJECUCIÓN CORRECTA DE {args.phase.upper()}")
+    return 0
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

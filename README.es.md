@@ -139,3 +139,4 @@ python3 src/__main__.py -p wrangler
 
 * **Resultados:** El archivo final estará en `data/outputs/empresas_constitucion_limpio.csv`.
 * **Logs:** Puedes consultar el historial de ejecución y posibles errores en la carpeta `data/logs/`, donde se generará un archivo diario basado en la fecha de ejecución (`pipeline_YYYYMMDD.log`).
+* **Código de salida:** Cada fase termina con código `0` si todo ha ido bien y `1` si algún paso ha fallado (entrada inexistente, descarga fallida, PDF ilegible...), para que un bucle, un cron o un orquestador puedan detectar el fallo.

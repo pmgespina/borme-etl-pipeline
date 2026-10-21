@@ -5,9 +5,13 @@
 from bs4 import BeautifulSoup
 import time
 import os
+import logging
 
 # http_client: sesión HTTP propia con timeout y reintentos (ver http_client.py).
 from http_client import crear_sesion, TIMEOUT
+
+# Los mensajes van al logger configurado en __main__.py: consola y fichero de log
+logger = logging.getLogger(__name__)
 
 # Una sola sesión reutiliza la conexión y aplica timeout y reintentos a todas las peticiones
 SESION = crear_sesion()
@@ -15,17 +19,16 @@ SESION = crear_sesion()
 def html(url):
     """
     Descarga el código HTML de una URL dada.
-    Devuelve un objeto BeautifulSoup o None si falla.
+    Devuelve un objeto BeautifulSoup, o None si ese día no hay BORME publicado.
+    Los errores reales se propagan para que run_spider los cuente en lugar de ocultarlos.
     """
-    print(f"Descargando: {url}")
-    try:
-        response = SESION.get(url, timeout=TIMEOUT)
-        response.raise_for_status()
-        time.sleep(1) # Respeto al servidor
-        return BeautifulSoup(response.text, 'html.parser')
-    except Exception as e:
-        print(f"Error descargando {url}: {e}")
+    logger.info(f"Descargando: {url}")
+    response = SESION.get(url, timeout=TIMEOUT)
+    time.sleep(1) # Pausa de cortesía
+    if response.status_code == 404:
         return None
+    response.raise_for_status()
+    return BeautifulSoup(response.text, 'html.parser')
 
 def extraer_urls(soup):
     """
@@ -47,6 +50,7 @@ def extraer_urls(soup):
 def guardar_fichero(urls, fichero_salida):
     """
     Guarda la lista de URLs en un archivo de texto.
+    Devuelve True si todo fue bien y False si hubo un error.
     """
     try:
         # Aseguramos que el directorio exista
@@ -66,18 +70,22 @@ def guardar_fichero(urls, fichero_salida):
         with open(fichero_salida, "a", encoding="utf-8") as f:
             for url in nuevas:
                 f.write(url + "\n")
-        print(f"Éxito: {len(nuevas)} URLs nuevas guardadas en '{fichero_salida}' "
-              f"({len(urls) - len(nuevas)} ya existían).")
+        logger.info(f"Éxito: {len(nuevas)} URLs nuevas guardadas en '{fichero_salida}' "
+                    f"({len(urls) - len(nuevas)} ya existían).")
+        return True
     except Exception as e:
-        print(f"Error al guardar el archivo: {e}")
+        logger.error(f"Error al guardar el archivo: {e}")
+        return False
 
 # Función puente para llamarlo desde __main__.py
 def run_spider(fecha, archivo_salida):
     """
     Función encargada de coordinar el proceso para una fecha específica.
     Recibe la fecha y el lugar donde guardar los resultados.
+    Devuelve el número de errores (0 si todo fue bien) para que __main__.py
+    pueda terminar con un código de salida distinto de cero si algo falló.
     """
-    print(f"Procesando fecha: {fecha}")
+    logger.info(f"Procesando fecha: {fecha}")
     
     # Parseamos la fecha dividiendo el string según los digitos esperados
     anio = fecha[:4]
@@ -88,16 +96,22 @@ def run_spider(fecha, archivo_salida):
     url_boe = f"https://www.boe.es/borme/dias/{anio}/{mes}/{dia}/"
 
     # Obtener el HTML parseado
-    soup = html(url_boe)
+    try:
+        soup = html(url_boe)
+    except Exception as e:
+        logger.error(f"Error descargando {url_boe}: {e}")
+        return 1
     
-    if soup:
-        # Extraer las URLs específicas de cada PDF
-        urls_dia = extraer_urls(soup)
-        
-        if urls_dia:
-            # Guardamos las URLs encontradas en el fichero de salida
-            guardar_fichero(urls_dia, archivo_salida)
-        else:
-            print(f"No se encontraron URLs de PDFs para el día {fecha}.")
-    else:
-        print(f"No encontramos el recurso HTML para la fecha {fecha}")
+    if soup is None:
+        logger.warning(f"No hay BORME publicado el día {fecha} (festivo o fin de semana).")
+        return 0
+
+    # Extraer las URLs específicas de cada PDF
+    urls_dia = extraer_urls(soup)
+    
+    if not urls_dia:
+        logger.warning(f"No se encontraron URLs de PDFs para el día {fecha}.")
+        return 0
+
+    # Guardamos las URLs encontradas en el fichero de salida
+    return 0 if guardar_fichero(urls_dia, archivo_salida) else 1

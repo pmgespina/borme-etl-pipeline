@@ -139,3 +139,4 @@ python3 src/__main__.py -p wrangler
 
 * **Results:** The final file will be at `data/outputs/empresas_constitucion_limpio.csv`.
 * **Logs:** You can check the execution history and possible errors in the `data/logs/` folder, where a daily file based on the run date will be generated (`pipeline_YYYYMMDD.log`).
+* **Exit code:** Each phase exits with code `0` on success and `1` if any step failed (missing input, failed download, unreadable PDF...), so loops, cron jobs or an orchestrator can detect failures.
