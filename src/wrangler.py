@@ -288,9 +288,3 @@ def run_wrangler(input_json, output_csv):
         
     except Exception as e:
         print(f"Error escribiendo el CSV: {e}")
-
-if __name__ == "__main__":
-    # Bloque de pruebas manuales
-    INPUT_TEST = "/Users/pablomoreno/Desktop/ADQUISICION/clase10/practicafinal/data/outputs/empresas_borme.json"
-    OUTPUT_TEST = "/Users/pablomoreno/Desktop/ADQUISICION/clase10/practicafinal/data/outputs/empresas_constitucion_limpio.csv"
-    run_wrangler(INPUT_TEST, OUTPUT_TEST)

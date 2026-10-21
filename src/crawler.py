@@ -270,12 +270,3 @@ def run_crawler(input_path, output_file):
         
     except Exception as e:
         print(f"Error guardando el JSON: {e}")
-
-if __name__ == "__main__":
-    # Test input: Ruta donde están tus PDFs (o un PDF suelto)
-    test_input = "/Users/pablomoreno/Desktop/ADQUISICION/clase10/practicafinal/data/outputs/pdfs_borme/"
-    
-    # Test output: Ruta donde quieres que aparezca el archivo JSON con los resultados
-    test_output = "/Users/pablomoreno/Desktop/ADQUISICION/clase10/practicafinal/data/outputs/empresas_borme.json"
-
-    run_crawler(test_input, test_output)
