@@ -53,7 +53,7 @@ def limpiar_capital(capital_str):
         limpio = limpio.replace(".", "").replace(",", ".")
         return float(limpio)
     except ValueError:
-        return 0.0
+        return None
 
 def formatear_fecha(fecha_str):
     """

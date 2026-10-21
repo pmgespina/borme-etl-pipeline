@@ -26,6 +26,7 @@ practicafinal/
 │   ├── __main__.py          # Entry point (Orchestrator).
 │   ├── spider.py            # Link finder.
 │   ├── fetcher.py           # File downloader.
+│   ├── http_client.py       # Shared HTTP session (timeouts, retries, User-Agent).
 │   ├── crawler.py           # Information extractor (PDF -> JSON).
 │   └── wrangler.py          # Data cleaner (JSON -> CSV).
 ├── requirements.txt         # External dependencies list.

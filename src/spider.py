@@ -1,17 +1,16 @@
 # Importamos las librerías necesarias:
-# requests: es como un navegador web para Python.
 # BeautifulSoup (de la librería bs4): es un "analizador" de páginas web.
 # time: sirve para controlar el tiempo.
 # os: para navegar por las carpetas del ordenador.
-import requests
 from bs4 import BeautifulSoup
 import time
 import os
 
-# CONFIGURACIÓN INICIAL
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
-}
+# http_client: sesión HTTP propia con timeout y reintentos (ver http_client.py).
+from http_client import crear_sesion, TIMEOUT
+
+# Una sola sesión reutiliza la conexión y aplica timeout y reintentos a todas las peticiones
+SESION = crear_sesion()
 
 def html(url):
     """
@@ -20,9 +19,9 @@ def html(url):
     """
     print(f"Descargando: {url}")
     try:
-        response = requests.get(url, headers=HEADERS)
+        response = SESION.get(url, timeout=TIMEOUT)
         response.raise_for_status()
-        time.sleep(1) # Pausa de cortesía
+        time.sleep(1) # Respeto al servidor
         return BeautifulSoup(response.text, 'html.parser')
     except Exception as e:
         print(f"Error descargando {url}: {e}")

@@ -1,15 +1,14 @@
 # Importamos las librerías necesarias:
-# requests: es como un navegador web para Python.
+# http_client: sesión HTTP propia con timeout y reintentos (ver http_client.py).
 # time: sirve para controlar el tiempo.
 # os: para navegar por las carpetas del ordenador.
-import requests
 import time
 import os
 
-# CONFIGURACIÓN INICIAL
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
-}
+from http_client import crear_sesion, TIMEOUT
+
+# Una sola sesión reutiliza la conexión y aplica timeout y reintentos a todas las descargas
+SESION = crear_sesion()
 
 def leer_urls(ruta_fichero):
     """
@@ -43,7 +42,7 @@ def descargar_archivos(urls, output_dir):
         print(f"[{i}/{total}] Descargando: {nombre_fichero}")
 
         try:
-            response = requests.get(url, headers=HEADERS)
+            response = SESION.get(url, timeout=TIMEOUT)
             time.sleep(1) # Respeto al servidor
             
             if response.status_code == 200:
