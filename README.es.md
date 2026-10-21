@@ -135,6 +135,14 @@ Limpiamos los datos y generamos el archivo final filtrado.
 python3 src/__main__.py -p wrangler
 ```
 
+## Tests
+
+La lógica de parseo (nombres, direcciones, capital, fechas, provincias) y el comportamiento del spider y el fetcher al reejecutarse están cubiertos por tests unitarios. Usan pequeñas muestras de texto y una sesión HTTP falsa, así que se ejecutan en menos de un segundo y sin red.
+
+```bash
+python3 -m pytest
+```
+
 ## Logs y Resultados
 
 * **Resultados:** El archivo final estará en `data/outputs/empresas_constitucion_limpio.csv`.

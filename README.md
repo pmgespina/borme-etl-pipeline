@@ -135,6 +135,14 @@ We clean the data and generate the final filtered file.
 python3 src/__main__.py -p wrangler
 ```
 
+## Tests
+
+The parsing logic (names, addresses, capital, dates, provinces) and the re-run behaviour of the spider and fetcher are covered by unit tests. They use small text samples and a fake HTTP session, so they run in under a second without network access.
+
+```bash
+python3 -m pytest
+```
+
 ## Logs and Results
 
 * **Results:** The final file will be at `data/outputs/empresas_constitucion_limpio.csv`.

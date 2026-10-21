@@ -11,3 +11,6 @@ data/outputs/
 # Python
 __pycache__/
 *.pyc
+
+# Tests
+.pytest_cache/
