@@ -39,6 +39,11 @@ def descargar_archivos(urls, output_dir):
         nombre_fichero = url.split("/")[-1]
         ruta_destino = os.path.join(output_dir, nombre_fichero)
 
+        # Si el PDF ya está descargado lo saltamos: reejecutar el fetcher solo baja lo que falta
+        if os.path.exists(ruta_destino):
+            print(f"[{i}/{total}] Ya existe, se omite: {nombre_fichero}")
+            continue
+
         print(f"[{i}/{total}] Descargando: {nombre_fichero}")
 
         try:
@@ -46,8 +51,12 @@ def descargar_archivos(urls, output_dir):
             time.sleep(1) # Respeto al servidor
             
             if response.status_code == 200:
-                with open(ruta_destino, "wb") as f:
+                # Escribimos primero en un fichero temporal y lo renombramos al terminar.
+                # Sirve para rastrear descargas incompletas si el proceso se interrumpe.
+                ruta_temporal = ruta_destino + ".part"
+                with open(ruta_temporal, "wb") as f:
                     f.write(response.content)
+                os.replace(ruta_temporal, ruta_destino)
             else:
                 print(f"Error {response.status_code} al descargar.")
 

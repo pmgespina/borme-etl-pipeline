@@ -44,13 +44,13 @@ Es el punto de entrada único. Utiliza `argparse` para gestionar los argumentos 
 Se conecta a la web del BOE para una fecha específica.
 
 * **Función:** Analiza el HTML del día y extrae las URLs de los PDFs provinciales.
-* **Modo Append:** Guarda las URLs en `data/outputs/urls_borme.txt` añadiéndolas al final sin borrar las anteriores (ideal para bucles de varios días).
+* **Append idempotente:** Añade las URLs nuevas al final de `data/outputs/urls_borme.txt` y omite las que ya estaban, así que se puede repetir un día o un mes entero sin generar duplicados.
 
 ### 3. `fetcher.py`
 
 Lee la lista de URLs generada por el spider.
 
-* **Función:** Descarga los PDFs uno a uno en `data/outputs/pdfs_borme/`, comprobando previamente que el archivo de URLs existe. Incluye pausas para no saturar el servidor.
+* **Función:** Descarga los PDFs uno a uno en `data/outputs/pdfs_borme/`, comprobando previamente que el archivo de URLs existe. Omite los PDFs ya descargados y escribe cada fichero de forma atómica, de modo que una ejecución interrumpida se puede relanzar sin más. Incluye pausas para no saturar el servidor.
 
 ### 4. `crawler.py`
 
@@ -105,11 +105,9 @@ Para cumplir con el objetivo de obtener las empresas constituidas en **Septiembr
 
 ### PASO 1: Spider (Recopilar URLs de todo el mes)
 
-Ejecutamos un bucle para rastrear del día 1 al 30.
-*(Nota: Si tienes un archivo `urls_borme.txt` antiguo, bórralo antes para evitar duplicados)*.
+Ejecutamos un bucle para rastrear del día 1 al 30. Repetirlo es seguro: las URLs ya guardadas no se duplican.
 
 ```bash
-rm data/outputs/urls_borme.txt  # Opcional: Limpiar ejecución anterior
 for i in {01..30}; do python3 src/__main__.py -p spider -d 202509$i; done
 ```
 

@@ -51,12 +51,23 @@ def guardar_fichero(urls, fichero_salida):
     try:
         # Aseguramos que el directorio exista
         os.makedirs(os.path.dirname(fichero_salida), exist_ok=True)
-        
-        # Vamos añadiendo las URLs de los días que queramos descargar a un fichero de texto
+
+        # Leemos las URLs ya guardadas para no duplicarlas. Así el spider es idempotente:
+        # repetir un día (o todo el mes) no añade líneas repetidas ni obliga a borrar el fichero.
+        existentes = set() # Más eficiente que recorrer una lista
+        if os.path.exists(fichero_salida):
+            with open(fichero_salida, "r", encoding="utf-8") as f:
+                existentes = {line.strip() for line in f if line.strip()}
+
+        # dict.fromkeys elimina duplicados dentro del propio día manteniendo el orden
+        nuevas = [url for url in dict.fromkeys(urls) if url not in existentes]
+
+        # Vamos añadiendo las URLs nuevas al final del fichero de texto
         with open(fichero_salida, "a", encoding="utf-8") as f:
-            for url in urls:
+            for url in nuevas:
                 f.write(url + "\n")
-        print(f"Éxito: Se han guardado {len(urls)} URLs en '{fichero_salida}'.")
+        print(f"Éxito: {len(nuevas)} URLs nuevas guardadas en '{fichero_salida}' "
+              f"({len(urls) - len(nuevas)} ya existían).")
     except Exception as e:
         print(f"Error al guardar el archivo: {e}")
 
