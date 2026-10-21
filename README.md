@@ -68,6 +68,15 @@ The data refiner.
 * **Address Algorithm:** Uses advanced **Regular Expressions (Regex)** with 5 priority strategies to parse complex addresses (street type, name, number, city), handling cases without commas, with kilometer markers, blocks, etc.
 * **Output:** Generates the final deliverable: `empresas_constitucion_limpio.csv`.
 
+### 6. `http_client.py`
+
+Shared HTTP configuration used by the spider and the fetcher.
+
+* **Single session:** Both modules reuse one `requests` session, which keeps the connection open between requests to the same server.
+* **Timeouts:** Every request has a connect and read timeout, so a server that stops responding cannot hang the pipeline.
+* **Retries:** Temporary server errors (429 and 5xx) are retried up to three times with exponential backoff, honouring the `Retry-After` header.
+* **User-Agent:** A browser User-Agent defined in a single place, so it is not duplicated across modules.
+
 ## Libraries and Dependencies
 
 ### Why is `requirements.txt` so short?

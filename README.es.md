@@ -68,6 +68,15 @@ El refinador de datos.
 * **Algoritmo de Domicilios:** Utiliza **Expresiones Regulares (Regex)** avanzadas con 5 estrategias de prioridad para separar direcciones complejas (Tipo de vía, Nombre, Número, Ciudad), gestionando casos sin comas, con kilómetros, bloques, etc.
 * **Salida:** Genera el entregable final: `empresas_constitucion_limpio.csv`.
 
+### 6. `http_client.py`
+
+Configuración HTTP compartida por el spider y el fetcher.
+
+* **Sesión única:** Ambos módulos reutilizan una misma sesión de `requests`, que mantiene abierta la conexión entre peticiones al mismo servidor.
+* **Timeouts:** Cada petición tiene un tiempo máximo de conexión y de lectura, de modo que un servidor que deja de responder no puede bloquear el pipeline.
+* **Reintentos:** Los errores temporales del servidor (429 y 5xx) se reintentan hasta tres veces con espera exponencial, respetando la cabecera `Retry-After`.
+* **User-Agent:** Un User-Agent de navegador definido en un único sitio, en lugar de duplicado en varios módulos.
+
 ## Librerías y Dependencias
 
 ### ¿Por qué `requirements.txt` es tan corto?
